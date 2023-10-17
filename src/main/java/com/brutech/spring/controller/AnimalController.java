@@ -1,6 +1,8 @@
 package com.brutech.spring.controller;
 
+import com.brutech.spring.dto.AnimalResponse;
 import com.brutech.spring.entity.Animal;
+import com.brutech.spring.validation.AnimalValidation;
 import jakarta.annotation.PostConstruct;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,30 +21,60 @@ public class AnimalController {
    }
 
    @GetMapping("/")
-   public List<Animal> findAll() {
-       return animals.values().stream().toList();
+   public AnimalResponse findAll() {
+       //return animals.values().stream().toList();
+       return new AnimalResponse(animals.values().stream().toList().toString(), "Success", 200);
    }
 
     @GetMapping("/{id}")
-   public Animal find(@PathVariable Integer id) {
-       return animals.get(id);
+   public AnimalResponse find(@PathVariable Integer id) {
+        if(!AnimalValidation.isIdValid(id)){
+            return new AnimalResponse(null, "Animal Id is not valid", 400);
+        }
+        if(!AnimalValidation.isAnimalContains(animals, id)){
+            return new AnimalResponse(null, "Animal is not found with this id:" + id , 404);
+        }
+
+       return new AnimalResponse(animals.get(id).getName(), "Success", 200);
    }
 
    @PostMapping("/")
-   public Animal save(@RequestBody Animal animal) {
+   public AnimalResponse save(@RequestBody Animal animal) {
+       if (!AnimalValidation.isAnimalCredentialsValid(animal)){
+           return new AnimalResponse(null, "Animal credentials are not valid", 400);
+       }
+
        animals.put(animal.getId(), animal);
-       return animals.get(animal.getId());
+       return new AnimalResponse(animals.get(animal.getId()).getName(), "Success", 200);
    }
 
     @PutMapping("/{id}")
-    public Animal update(@PathVariable Integer id, @RequestBody Animal animal) {
+    public AnimalResponse update(@PathVariable Integer id, @RequestBody Animal animal) {
+       animal.setId(id);
+       if (!AnimalValidation.isIdValid(id)){
+           return new AnimalResponse(null, "Animal Id is not valid", 400);
+       }
+
+        if(!AnimalValidation.isAnimalContains(animals, id)){
+            return new AnimalResponse(null, "Animal is not found with this id:" + id , 404);
+        }
+
+        if (!AnimalValidation.isAnimalCredentialsValid(animal)){
+            return new AnimalResponse(null, "Animal credentials are not valid", 400);
+        }
        animals.put(id, animal);
-       return animals.get(id);
+       return new AnimalResponse(animals.get(id).getName(), "Success", 200);
     }
 
     @DeleteMapping("/{id}")
-    public Animal delete(@PathVariable Integer id) {
-       return animals.remove(id);
+    public AnimalResponse delete(@PathVariable Integer id) {
+         if (!AnimalValidation.isIdValid(id)){
+              return new AnimalResponse(null, "Animal Id is not valid", 400);
+         }
+        if(!AnimalValidation.isAnimalContains(animals, id)){
+            return new AnimalResponse(null, "Animal is not found with this id:" + id , 404);
+        }
+       return new AnimalResponse(animals.remove(id).getName(), "Success", 200);
     }
 
 
