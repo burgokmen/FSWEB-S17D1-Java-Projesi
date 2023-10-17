@@ -18,4 +18,5 @@ public class AnimalValidation {
                 animal.getName() != null && !animal.getName().isEmpty() &&
                 animal.getWeight() > 0;
     }
+
 }
