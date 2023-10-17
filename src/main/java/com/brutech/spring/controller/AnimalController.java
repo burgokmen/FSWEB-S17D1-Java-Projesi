@@ -34,6 +34,16 @@ public class AnimalController {
        return animals.get(animal.getId());
    }
 
+    @PutMapping("/{id}")
+    public Animal update(@PathVariable Integer id, @RequestBody Animal animal) {
+       animals.put(id, animal);
+       return animals.get(id);
+    }
+
+    @DeleteMapping("/{id}")
+    public Animal delete(@PathVariable Integer id) {
+       return animals.remove(id);
+    }
 
 
 
